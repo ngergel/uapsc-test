@@ -4,129 +4,191 @@
 # This script supports C, C++, and Python 3.
 
 # Global variables.
-SOURCEPATH="$(find ~/ -name "uapc-test" 2> >(grep -v 'Permission denied' >&2))"
-DIR="~/.uapsc-test_tmp"
-CONFIG="$DIR/prob.conf"
+SOURCE_PATH="$(find ~/ -name "uapsc-test" 2> >(grep -v 'Permission denied' >&2))"
+DIR="${SOURCE_PATH}/tmp"
+CONFIG="${DIR}/prob.conf"
+ARGS=("$@")
+
+# Argument iterator.
+i="0"
 
 # Flags to compile C/C++ programs with.
 CFLAGS="-Wall"
 
-echo $DIR $CONFIG
 # https://unix.stackexchange.com/questions/12068/how-to-measure-time-of-program-execution-and-store-that-inside-a-variable
 # https://stackoverflow.com/questions/16548528/command-to-get-time-in-milliseconds
 # https://www.tecmint.com/find-directory-in-linux/
 # https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find
+# https://stackoverflow.com/questions/10307280/how-to-define-a-shell-script-with-variable-number-of-arguments
 
-# Usage function. Takes in the first parameter as
-# the error output, and prints that with the proper usage
-# the script.
+# Prints correct usage. Takes in an argument as the error message.
 usage() {
-	echo -e "Error: $1.\n\n"
+	echo -e "Error: Please specify a $1."
 	echo "Usage: ./uatest.sh [options] <command> [-p problem] [file-name]"
 	exit 2
 }
 
-# Verify a command is given.
-if [ -z $1 ]
-then
-	usage "please specify a command"
-fi
+# Verify a command or option is given.
+test $# -eq 0 && usage command
 
 # Help option.
-if [ $1 = "-h" ]
+if [ $1 = "-h" ] || [ $1 = "--help" ] || [ $1 = "help" ]
 then
-	echo "-h, test, submit, "
-	exit 0
+	cat $SOURCE_PATH/src/help.txt && exit 0 || exit 1
 fi
 
-# Command to execute a test.
-if [ $1 = "test" ]; then
-	# Check if an option is specified.
-	if [ $2 = "-o" ]; then
-		FLAG="true"
+# Clean command.
+test $1 = "clean" && rm -rf $DIR && exit 0
 
-		# Check that a problem id and file are specified.
-		if [ $3 != "-p" ] || [ -z $4 ]; then
-			usage "a valid problem id"
-		elif [ -z $5 ]; then
-			usage file
-		fi
+# Check for options.
+test $i -lt $# && test ${ARGS[$i]} = "-o" && output_flag="1" && (( i++ ))
 
-		# Set problem id and file.
-		PROB="$4"
-		FILE="$5"
-	else
-		# Check that a problem id and file are specified.
-		if [[ $2 != "-p" ]] || [[ -z $3 ]]; then
-			usage "a valid problem id"
-		elif [[ -z $4 ]]; then
-			usage file
-		fi
+# Verify a command is given after the options.
+test ! $i -lt $# && usage command
 
-		# Set problem id and file.
-		PROB="$3"
-		FILE="$4"
+# Test command.
+if [ ${ARGS[$i]} = "test" ]
+then
+	(( i++ ))
+
+	# Get problem id from file if possible.
+	test -f $CONFIG && . $CONFIG
+	
+	# If problem id and file is given as arguments.
+	if [ $((i + 2)) -lt $# ]
+	then
+		new_prob="${ARGS[$(( ++i ))]}"
+		new_file="${ARGS[$(( ++i ))]}"
 	fi
 
+	# If arguments differ from config data, download new test cases.
+	if [ $new_prob ] && { [ -z $PROB ] || [ $new_prob != $PROB ]; }
+	then
+		printf "Downloading test cases..."
+		PROB="$new_prob" && FILE="$new_file"
+
+		# Download sample test cases.
+		mkdir -p $DIR
+		wget -q -O $DIR/samples.zip https://open.kattis.com/problems/$PROB/file/statement/samples.zip > /dev/null
+
+		# Catch when not downloadable.
+		if [ $? -ne 0 ]; then
+			echo -e "\nUnable to download sample test cases from Kattis."
+			rm -f $DIR/samples.zip
+			exit 1
+		else
+			echo "downloaded!"
+			rm -f $DIR/*.in $DIR/*.ans
+			unzip -q $DIR/samples.zip -d $DIR
+			rm -f $DIR/samples.zip
+		fi
+	elif [ $new_file ]
+	then
+		# Update file if it has changed but the problem has not.
+		FILE="$new_file"
+	fi
+
+	# Check if problem id or file has been given.
+	test -z $PROB$FILE && usage "problem id and file"
+	test -z $PROB && usage "problem id"
+	test -z $FILE && usage file
+
 	# Catch non-supported languages.
-	if [[ $FILE != *".c" ]] && [[ $FILE != *".cpp" ]] && [[ $FILE != *".py" ]]; then
+	if [[ $FILE != *".c" ]] && [[ $FILE != *".cpp" ]] && [[ $FILE != *".py" ]]
+	then
 		echo "This script only supports C, C++, and Python 3."
 		exit 2
 	fi
 
-	# Make new directory to store test cases, and download them.
-	rm -rf $DIR
-	mkdir $DIR
-	wget -q -O $DIR/samples.zip https://open.kattis.com/problems/$PROB/file/statement/samples.zip > /dev/null
+	# Update config file.
+	echo -e "PROB=$PROB\nFILE=$FILE" > $CONFIG
 
-	# Catch when not downloadable.
-	if [ $? -ne 0 ]; then
-		echo "Unable to download sample test cases from Kattis."
-	else
-		unzip -q $DIR/samples.zip -d $DIR
-		rm -f $DIR/samples.zip
-	fi
+	# Tells the player what problem they are testing incase of issues.
+	echo -e "Problem id: $PROB\nFile: $FILE\n"
 
-	# Test the file.
-
-	# C or C++.
-	if [[ $FILE == *".c" ]] || [[ $FILE == *".cpp" ]]; then
-		g++ $FILE $CFLAGS -o a.out
+	# Compile C or C++.
+	if [[ $FILE == *".c" ]] || [[ $FILE == *".cpp" ]]
+	then
+		# Compile the program.
+		g++ $FILE $CFLAGS -o $DIR/a.out
 		
 		# Exit on a compile error.
-		if [ $? -ne 0 ]; then
+		if [ $? -ne 0 ]
+		then
+			echo -e "Failed tests: \033[31mCompile Error\033[m"
 			exit 1
 		fi
+	fi
 
-		# Print outputs.
-		for i in $DIR/*.in; do
+	# Run against test cases.
+	for i in $DIR/*.in
+	do
+		# Run the program against the test case.
+		if [[ $FILE == *".c" ]] || [[ $FILE == *".cpp" ]]
+		then
 			START=$(date +%s%3N)
-			./a.out < $i > $i.test
+			$DIR/a.out < $i > ${i%.*}.test
 			COMP=$?
 			TIME=$(($(date +%s%3N)-START))
+		elif [[ $FILE == *".py" ]]
+		then
+			START=$(date +%s%3N)
+			python3 $FILE < $i > ${i%.*}.test
+			COMP=$?
+			TIME=$(($(date +%s%3N)-START))
+		else
+			echo "This script only supports C, C++, and Python 3."
+			exit 2
+		fi
 
-			if diff $i.test ${i%.*}.ans > /dev/null; then
-				echo "${i##*/}: Correct Answer, ${TIME}ms"
-			elif [ $COMP -eq 0 ]; then
-				echo "${i##*/}: Wrong Answer, ${TIME}ms"
-			elif [ $COMP -ne 0 ]; then
-				echo "${i##*/}: Runtime Error, ${TIME}ms"
-			fi
-		done
-		
-		rm -f a.out
+		# See what the result was.
+		if diff ${i%.*}.test ${i%.*}.ans > /dev/null
+		then
+			echo -e "${i##*/}: \033[32mCorrect Answer\033[m...${TIME}ms"
+		elif [ $COMP -eq 0 ]
+		then
+			echo -e "${i##*/}: \033[31mWrong Answer\033[m...${TIME}ms"
+		else
+			echo -e "${i##*/}: \033[31mRuntime Error\033[m...${TIME}ms\n"
+		fi
+
+		# If the output flag was set, print the output.
+		if [ $output_flag ] && [ $COMP -eq 0 ]
+		then
+			cat ${i%.*}.test && echo
+		fi
+
+		# Remove the produced output file.
+		rm -f ${i%.*}.test
+	done
+	
+	# Remove C/C++ binary and exit.
+	rm -f $DIR/a.out
+	exit 0
+fi
+
+# Submit command.
+if [ ${ARGS[$i]} = "submit" ]
+then
+	(( i++ ))
+	
+	# Get problem id from file if possible.
+	test -f $CONFIG && . $CONFIG
+	
+	# If problem id and file is given as arguments.
+	if [ $((i + 2)) -lt $# ]
+	then
+		PROB="${ARGS[$(( ++i ))]}"
+		FILE="${ARGS[$(( ++i ))]}"
 	fi
 
-	# Python 3.
-	if [[ $FILE == *".py" ]]; then
-		# Print outputs.
-		for i in $DIR/*.in; do
-			echo "${i##*/}" && echo "--------"
-			python3 $FILE < $i
-			echo ""
-		done
-	fi
+	# Check if problem id or file has been given.
+	test -z $PROB$FILE && usage "problem id and file"
+	test -z $PROB && usage "problem id"
+	test -z $FILE && usage file
 
-	# Remove the created directory.
+	# Submit the file to Kattis, clean, and exit.
+	python3 src/submit.py -p $PROB $FILE -f
 	rm -rf $DIR
+	exit 0
 fi

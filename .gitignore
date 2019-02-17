@@ -1,0 +1,15 @@
+# Files to ignore when using Git.
+
+# Mac-only Finder attributes file.
+**/.DS_Store
+
+# Any input/output files.
+*.out
+*.in
+*.ans
+
+# Kattis configuration file.
+src/.kattisrc
+
+# Directory generated for Kattis testing.
+tmp
