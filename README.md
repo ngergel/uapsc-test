@@ -15,23 +15,23 @@ Note that this script was built to be called from anywhere in the user's home di
 not just the repository directory.
 
 ## Commands
-	* `clean` - Deletes the local copies of sample test cases and data on what was the last problem id/file. 
-	* `test` - Tests the file given against sample input. May download test cases when needed.
-	* `submit` - Submits the solution code remotely. This is not enabled by default, see below for details.
+- `clean` - Deletes the local copies of sample test cases and data on what was the last problem id/file. 
+- `test` - Tests the file given against sample input. May download test cases when needed.
+- `submit` - Submits the solution code remotely. This is not enabled by default, see below for details.
 
 ## Options
-	* `-h`, `--help`, `help` - Prints a help message to terminal then exits.
-	* `-o`, `--output` - When this flag is given, it prints the output of the program after each test case.
-	* `-p <problem>` - Specifies the Kattis problem id to download test cases for/submit to.
-	* `<file-name>` - Specifies the file to test with.
+- `-h`, `--help`, `help` - Prints a help message to terminal then exits.
+- `-o`, `--output` - When this flag is given, it prints the output of the program after each test case.
+- `-p <problem>` - Specifies the Kattis problem id to download test cases for/submit to.
+- `<file-name>` - Specifies the file to test with.
 
 ## Example Usage
 Some examples of calling the script:<br/>
 `./uatest.sh clean`<br/>
 `./uatest.sh test -p abc soln.cpp`<br/>
-`~/<path-to-repo>/uatest.sh -o test -p abc a_diff_soln.py`<br/>
+`~/<path-to-repo>/uatest.sh -o test -p abc diff_soln.py`<br/>
 `./uatest.sh --output test` (Assuming the problem and file were specified previously.)<br/>
-`./uatest.sh submit -p abc soln.c`<br/>
+`./uatest.sh submit -p abc some_soln.c`<br/>
 `./uatest.sh submit` (Assuming the problem and file were specified previously.)<br/>
 
 ## Testing
