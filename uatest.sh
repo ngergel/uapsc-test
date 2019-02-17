@@ -15,16 +15,13 @@ i="0"
 # Flags to compile C/C++ programs with.
 CFLAGS="-Wall"
 
-# https://unix.stackexchange.com/questions/12068/how-to-measure-time-of-program-execution-and-store-that-inside-a-variable
-# https://stackoverflow.com/questions/16548528/command-to-get-time-in-milliseconds
-# https://www.tecmint.com/find-directory-in-linux/
+# Full credit to mklement0 from Stack Overflow for the command that is used to find the path of the GitHub repo.
 # https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find
-# https://stackoverflow.com/questions/10307280/how-to-define-a-shell-script-with-variable-number-of-arguments
 
 # Prints correct usage. Takes in an argument as the error message.
 usage() {
-	echo -e "Error: Please specify a $1."
-	echo "Usage: ./uatest.sh [options] <command> [-p problem] [file-name]"
+	echo -e "\033[31mError\033[m: Please specify a $1."
+	echo -e "\033[33mUsage\033[m: ./uatest.sh [options] <command> [-p problem] [file-name]"
 	exit 2
 }
 
@@ -41,7 +38,7 @@ fi
 test $1 = "clean" && rm -rf $DIR && exit 0
 
 # Check for options.
-test $i -lt $# && test ${ARGS[$i]} = "-o" && output_flag="1" && (( i++ ))
+test $i -lt $# && test ${ARGS[$i]} = "-o" || test ${ARGS[$i]} = "--output" && output_flag="1" && (( i++ ))
 
 # Verify a command is given after the options.
 test ! $i -lt $# && usage command
@@ -171,7 +168,7 @@ fi
 if [ ${ARGS[$i]} = "submit" ]
 then
 	(( i++ ))
-	
+
 	# Get problem id from file if possible.
 	test -f $CONFIG && . $CONFIG
 	
@@ -186,6 +183,9 @@ then
 	test -z $PROB$FILE && usage "problem id and file"
 	test -z $PROB && usage "problem id"
 	test -z $FILE && usage file
+
+	# Tells the player what problem they are testing incase of issues.
+	echo -e "Problem id: $PROB\nFile: $FILE\n"
 
 	# Submit the file to Kattis, clean, and exit.
 	python3 src/submit.py -p $PROB $FILE -f
