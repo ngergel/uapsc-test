@@ -51,18 +51,25 @@ then
 	# Get problem id from file if possible.
 	test -f $CONFIG && . $CONFIG
 	
-	# If problem id and file is given as arguments.
-	if [ $((i + 2)) -lt $# ]
+	# Read in problem id and file arguments.
+	if [ $((i + 2)) -lt $# ] && [ ${ARGS[$i]} = "-p" ]
 	then
+		# If both problem id and file name were given.
 		new_prob="${ARGS[$(( ++i ))]}"
 		new_file="${ARGS[$(( ++i ))]}"
+	elif [ $i -lt $# ] && [ ${ARGS[$i]} != "-p" ]
+	then
+		# Read in file name if it was given and implicitly infer problem id.
+		new_file="${ARGS[$i]}"
+		new_prob="${ARGS[$i]##*/}" && new_prob="${new_prob%.*}"
 	fi
 
 	# If arguments differ from config data, download new test cases.
 	if [ $new_prob ] && { [ -z $PROB ] || [ $new_prob != $PROB ]; }
 	then
-		printf "Downloading test cases..."
+		# Information for the user.
 		PROB="$new_prob" && FILE="$new_file"
+		printf "Downloading test cases..."
 
 		# Download sample test cases.
 		mkdir -p $DIR
@@ -70,7 +77,8 @@ then
 
 		# Catch when not downloadable.
 		if [ $? -ne 0 ]; then
-			echo -e "\nUnable to download sample test cases from Kattis."
+			echo "unable to download test cases."
+			echo -e "Problem id: $PROB\nFile: $FILE\n"
 			rm -f $DIR/samples.zip
 			exit 1
 		else
@@ -97,10 +105,8 @@ then
 		exit 2
 	fi
 
-	# Update config file.
+	# Update config file and print problem id and file name for the user.
 	echo -e "PROB=$PROB\nFILE=$FILE" > $CONFIG
-
-	# Tells the player what problem they are testing incase of issues.
 	echo -e "Problem id: $PROB\nFile: $FILE\n"
 
 	# Compile C or C++.
@@ -172,11 +178,17 @@ then
 	# Get problem id from file if possible.
 	test -f $CONFIG && . $CONFIG
 	
-	# If problem id and file is given as arguments.
-	if [ $((i + 2)) -lt $# ]
+	# Read in problem id and file arguments.
+	if [ $((i + 2)) -lt $# ] && [ ${ARGS[$i]} = "-p" ]
 	then
+		# If both problem id and file name were given.
 		PROB="${ARGS[$(( ++i ))]}"
 		FILE="${ARGS[$(( ++i ))]}"
+	elif [ $i -lt $# ] && [ ${ARGS[$i]} != "-p" ]
+	then
+		# Read in file name if it was given and implicitly infer problem id.
+		FILE="${ARGS[$i]}"
+		PROB="${ARGS[$i]##*/}" && PROB="${new_prob%.*}"
 	fi
 
 	# Check if problem id or file has been given.
@@ -184,7 +196,7 @@ then
 	test -z $PROB && usage "problem id"
 	test -z $FILE && usage file
 
-	# Tells the player what problem they are testing incase of issues.
+	# Tells the user what problem they are testing incase of issues.
 	echo -e "Problem id: $PROB\nFile: $FILE\n"
 
 	# Submit the file to Kattis, clean, and exit.

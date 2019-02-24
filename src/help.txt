@@ -1,6 +1,9 @@
 Usage: ./uatest.sh [options] <command> [-p problem] [file-name]
 
-Note that <problem> and <file-name> need to be specified only the first time either 'test' or 'submit' is called.
+Note that the file only needs to be specified only the first time either 'test' or 'submit' is called.
+If no problem id is specified, the problem id is infered from the file name.
+
+Futhermore, this script only supports C, C++, and Python 3.
 
 Commands:
  - 'clean' ........... Deletes test cases and problem meta data.
@@ -9,8 +12,8 @@ Commands:
 
 Options:
  - '-h', '--help' .... Prints this help message and exits.
- - '-o', '--output' .. When using the 'test' subcommand, this option enables printing full output for each test case.
+ - '-o', '--output' .. When using the 'test' subcommand, print the output of the solution code.
  - '-p <problem>' .... Specifies the Kattis problem id to download test cases for/submit to.
  - '<file-name>' ..... Specifies the file to test with.
 
-v1.0 - Last updated Feb. 2019
+v2.0 - Last updated Feb. 2019

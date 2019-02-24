@@ -12,14 +12,17 @@ The script supports C, C++, and Python 3.
 
 Usage: `./uatest.sh [options] <command> [-p problem] [file-name]`<br/><br/>
 
+Note that the file only needs to be specified only the first time either `test` or `submit` is called.
+If no problem id is specified, the problem id is infered from the file name.
+
 ## Commands
-- `clean` - Deletes the local copies of sample test cases and problem meta data. 
+- `clean` - Deletes test cases and problem meta data.
 - `test` - Tests the file given against sample input. May download test cases when needed.
 - `submit` - Submits the solution code remotely. This is not enabled by default, see below for details.
 
 ## Options
 - `-h`, `--help`, `help` - Prints a help message and exits.
-- `-o`, `--output` - Print the output of the solution code after each test case.
+- `-o`, `--output` - When using the 'test' subcommand, print the output of the solution code.
 - `-p <problem>` - Specifies the Kattis problem id to download test cases for/submit to.
 - `<file-name>` - Specifies the file to test with.
 
@@ -34,9 +37,9 @@ Some examples of calling the script:<br/>
 
 ## Testing
 To test a given problem, run the script with the subcommand `test` and give
-the problem id and file name as arguments. Furthermore, the problem id and file
-name only need to specified the first time `test` is run, as it remembers the
-last id and file used.
+the problem id and file name as arguments. If no problem id is given, it infers it
+from the file name. Furthermore, the problem id and file name only need to specified
+the first time `test` is run, as it remembers the last id and file used.
 
 ## Submitting
 Initially, remote submissions are disabled. To submit remotely, the user must have
@@ -55,7 +58,8 @@ under an MIT licence.
 <br/><br/>
 This project and it's contributors are not affiliated with or endorsed by Kattis
 in any capacity. The file `submit.py` was not written by this project's contributors,
-and is entirely the property of Kattis. It is under an MIT licence: https://github.com/Kattis/kattis-cli.
+and is entirely the property of Kattis.<br/>
+It is under an MIT licence: https://github.com/Kattis/kattis-cli.
 <br/><br/>
 Additionally, in the development of this script the Stack Overflow article below is referenced:<br/>
 https://stackoverflow.com/questions/59895/get-the-source-directory-of-a-bash-script-from-within-the-script-itself.<br/>
