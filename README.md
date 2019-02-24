@@ -64,8 +64,8 @@ and is entirely the property of Kattis. Furthermore, full credit to Kattis and t
 it gets its problems from for the sample test cases.
 <br/><br/>
 Additionally, in the development of this script the Stack Overflow article below is referenced:<br/>
-https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find.<br/>
-Full credit mklement0 for a command used to in the script. See the script `uatest.sh` for details.
+https://stackoverflow.com/questions/59895/get-the-source-directory-of-a-bash-script-from-within-the-script-itself.<br/>
+Full credit to Dave Dopson for a command used to in the script. See the script `uatest.sh` for details.
 
 <br/>
 
