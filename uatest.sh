@@ -13,7 +13,7 @@ ARGS=("$@")
 i="0"
 
 # Flags to compile C/C++ programs with.
-CFLAGS="-Wall"
+CFLAGS="-g -O2 -static -std=gnu++17 -Wall"
 
 # Full credit to mklement0 from Stack Overflow for the command that is used to find the path of the GitHub repo.
 # https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find
