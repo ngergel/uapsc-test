@@ -12,4 +12,4 @@
 src/.kattisrc
 
 # Directory generated for Kattis testing.
-tmp
+.tmp

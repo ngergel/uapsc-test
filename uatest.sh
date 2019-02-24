@@ -4,8 +4,8 @@
 # This script supports C, C++, and Python 3.
 
 # Global variables.
-SOURCE_PATH="$(find ~/ -name "uapsc-test" 2> >(grep -v 'Permission denied' >&2))"
-DIR="${SOURCE_PATH}/tmp"
+SOURCE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="${SOURCE_PATH}/.tmp"
 CONFIG="${DIR}/prob.conf"
 ARGS=("$@")
 
@@ -15,8 +15,8 @@ i="0"
 # Flags to compile C/C++ programs with.
 CFLAGS="-g -O2 -static -std=gnu++17 -Wall"
 
-# Full credit to mklement0 from Stack Overflow for the command that is used to find the path of the GitHub repo.
-# https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find
+# Full credit to Dave Dopson from Stack Overflow for the command that is used to find the path of the GitHub repo.
+# https://stackoverflow.com/questions/59895/get-the-source-directory-of-a-bash-script-from-within-the-script-itself
 
 # Prints correct usage. Takes in an argument as the error message.
 usage() {
