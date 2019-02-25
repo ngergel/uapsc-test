@@ -188,7 +188,7 @@ then
 	then
 		# Read in file name if it was given and implicitly infer problem id.
 		FILE="${ARGS[$i]}"
-		PROB="${ARGS[$i]##*/}" && PROB="${new_prob%.*}"
+		PROB="${ARGS[$i]##*/}" && PROB="${PROB%.*}"
 	fi
 
 	# Check if problem id or file has been given.
@@ -200,7 +200,7 @@ then
 	echo -e "Problem id: $PROB\nFile: $FILE\n"
 
 	# Submit the file to Kattis, clean, and exit.
-	python3 src/submit.py -p $PROB $FILE -f
+	python3 $SOURCE_PATH/src/submit.py -p $PROB $FILE -f
 	rm -rf $DIR
 	exit 0
 fi
