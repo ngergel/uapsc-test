@@ -13,3 +13,6 @@ src/.kattisrc
 
 # Directory generated for Kattis testing.
 .tmp
+
+# Directory used for unit testing.
+unit-tests
