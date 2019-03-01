@@ -4,8 +4,9 @@
 # This script supports C, C++, and Python 3.
 
 # Global variables.
-SOURCE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-DIR="${SOURCE_PATH}/.tmp"
+INSTALL="$HOME/.uapcs-test"
+test ! -d $INSTALL && SOURCE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" || SOURCE_PATH="$INSTALL"
+DIR="${SOURCE_PATH}/test-cases"
 CONFIG="${DIR}/prob.conf"
 ARGS=("$@")
 
@@ -41,12 +42,16 @@ do
 			oflag="1" ;;
 		-p) # Problem id argument.
 			test $i -lt $# && prob="${ARGS[$(( i++ ))]}" || usage "Missing problem id." ;;
-		clean) # Clean command.
+		clean) # Clean subcommand.
 			test -z $cmnd && cmnd="clean" ;;
-		test) # Test command.
+		test) # Test subcommand.
 			test -z $cmnd && cmnd="test" ;;
-		submit) # Submit command.
+		submit) # Submit subcommand.
 			test -z $cmnd && cmnd="submit" ;;
+		install) # Install subcommand.
+			test -z $cmnd && cmnd="install" ;;
+		uninstall) # Uninstall subcommand.
+			test -z $cmnd && cmnd="uninstall" ;;
 		*) # General catch for file or invalid arguments.
 			if [ -z $file ]
 			then
@@ -70,10 +75,28 @@ test $hflag && cat $SOURCE_PATH/src/help.txt && exit 0
 # Make sure a command was actually given in the arguments.
 test -z $cmnd && usage "No valid command given."
 
-# Clean command.
+# Clean subcommand.
 test $cmnd = "clean" && rm -rf $DIR && exit 0
 
-# Test command.
+# Uninstall subcommand.
+test $cmnd = "uninstall" && test -f $HOME/bin/uatest && rm -rf $INSTALL $HOME/bin/uatest && exit 0
+
+# Install subcommand.
+if [ $cmnd = "install" ] && [ ! -d $INSTALL ] && [ ! -f $HOME/bin/uatest ]
+then
+	# Create a directory for the script in the home directory.
+	mkdir -p $INSTALL && mkdir -p $INSTALL/src
+	cp $SOURCE_PATH/src/submit.py $INSTALL/src/submit.py
+	cp $SOURCE_PATH/src/.kattisrc $INSTALL/src/.kattisrc 2> /dev/null
+	cp $SOURCE_PATH/src/help.txt $INSTALL/src/help.txt
+
+	# Copy the script over to the local bin and exit.
+	mkdir -p $HOME/bin
+	cp $SOURCE_PATH/uatest.sh $HOME/bin/uatest
+	exit 0
+fi
+
+# Test subcommand.
 if [ $cmnd = "test" ]
 then
 	# Check if problem id or file has been given.
@@ -174,7 +197,7 @@ then
 	exit 0
 fi
 
-# Submit command.
+# Submit subcommand.
 if [ $cmnd = "submit" ]
 then
 	# Check if problem id or file has been given.

@@ -13,12 +13,15 @@ The script supports C, C++, and Python 3.
 Usage: `./uatest.sh [options] <command> [-p problem] [file-name]`<br/><br/>
 
 Note that the file only needs to be specified only the first time either `test` or `submit` is called.
-If no problem id is specified, the problem id is infered from the file name.
+If no problem id is specified, the problem id is infered from the file name. If the script has
+been installed as a command, the command `uatest` can be used instead of the script.
 
-## Commands
+## Sub Commands
 - `clean` - Deletes test cases and problem meta data.
 - `test` - Tests the file given against sample input. May download test cases when needed.
 - `submit` - Submits the solution code remotely. This is not enabled by default, see below for details.
+- `install` - Installs the script as a command 'uatest', which works in place of the script. The terminal may need to be restarted.
+- `uninstall` - Uninstalls the command.
 
 ## Options
 - `-h`, `--help`, `help` - Prints a help message and exits.
