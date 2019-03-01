@@ -20,7 +20,7 @@ been installed as a command, the command `uatest` can be used instead of the scr
 - `clean` - Deletes test cases and problem meta data.
 - `test` - Tests the file given against sample input. May download test cases when needed.
 - `submit` - Submits the solution code remotely. This is not enabled by default, see below for details.
-- `install` - Installs the script as a command 'uatest', which works in place of the script. The terminal may need to be restarted.
+- `install` - Installs the script as a command `uatest`, in place of the script. The terminal may need to be restarted.
 - `uninstall` - Uninstalls the command.
 
 ## Options
