@@ -10,7 +10,7 @@ Sub Commands:
  - 'clean' ........... Deletes test cases and problem meta data.
  - 'test' ............ Tests the file given against sample input. May download test cases if needed.
  - 'submit' .......... Submits the solution code remotely. Not enabled by default, see README for details.
- - 'install' ......... Installs the script sas the command 'uatest', which works in place of the script. The terminal may need to be restarted.
+ - 'install' ......... Installs the script sas the command 'uatest', in place of the script. The terminal may need to be restarted.
  - 'uninstall' ....... Uninstalls the command.
 
 Options:
