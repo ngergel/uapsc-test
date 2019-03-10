@@ -14,13 +14,14 @@ Usage: `./uatest.sh [options] <command> [-p problem] [file-name]`<br/><br/>
 
 Note that the file only needs to be specified only the first time either `test` or `submit` is called.
 If no problem id is specified, the problem id is infered from the file name. If the script has
-been installed as a command, the command `uatest` can be used instead of the script.
+been installed as a command, the command `uat` can be used instead of the script. When no sub command is
+given, it defaults to the 'test' sub command.
 
 ## Sub Commands
 - `clean` - Deletes test cases and problem meta data.
 - `test` - Tests the file given against sample input. May download test cases when needed.
 - `submit` - Submits the solution code remotely. This is not enabled by default, see below for details.
-- `install` - Installs the script as a command `uatest`, in place of the script. The terminal may need to be restarted.
+- `install` - Installs the script as a command `uat`, in place of the script. The terminal may need to be restarted.
 - `uninstall` - Uninstalls the command.
 
 ## Options

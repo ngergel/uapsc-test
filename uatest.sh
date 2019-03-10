@@ -72,17 +72,18 @@ test -z $file && file="$CFILE"
 # Help option.
 test $hflag && cat $SOURCE_PATH/src/help.txt && exit 0
 
-# Make sure a command was actually given in the arguments.
-test -z $cmnd && usage "No valid command given."
+# If no command was given, default to 'test'.
+# Instead of handling an empty variable each time this is just easier.
+test -z $cmnd && cmnd="test"
 
 # Clean subcommand.
 test $cmnd = "clean" && rm -rf $DIR && exit 0
 
 # Uninstall subcommand.
-test $cmnd = "uninstall" && test -f $HOME/bin/uatest && rm -rf $INSTALL $HOME/bin/uatest && exit 0
+test $cmnd = "uninstall" && test -f $HOME/bin/uat && rm -rf $INSTALL $HOME/bin/uat && exit 0
 
 # Install subcommand.
-if [ $cmnd = "install" ] && [ ! -d $INSTALL ] && [ ! -f $HOME/bin/uatest ]
+if [ $cmnd = "install" ] && [ ! -d $INSTALL ] && [ ! -f $HOME/bin/uat ]
 then
 	# Create a directory for the script in the home directory.
 	mkdir -p $INSTALL && mkdir -p $INSTALL/src
@@ -90,9 +91,10 @@ then
 	cp $SOURCE_PATH/src/.kattisrc $INSTALL/src/.kattisrc 2> /dev/null
 	cp $SOURCE_PATH/src/help.txt $INSTALL/src/help.txt
 
-	# Copy the script over to the local bin and exit.
+	# Copy the script over to the local bin, delete current test cases, and exit.
 	mkdir -p $HOME/bin
-	cp $SOURCE_PATH/uatest.sh $HOME/bin/uatest
+	cp $SOURCE_PATH/uatest.sh $HOME/bin/uat
+	rm -rf $DIR
 	exit 0
 fi
 
